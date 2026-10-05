@@ -1,0 +1,3 @@
+vendor/
+# Credenciales locales (URL del script de Google y clave secreta): nunca se suben al repositorio
+config/hoja.local.php

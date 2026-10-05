@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+    Página única de la aplicación. Esta estructura es estática; el contenido dinámico
+    (resultados, ficha, grilla de meses) lo pinta JavaScript dentro de los contenedores
+    #resultados y #ficha. El JS arranca en src/js/main.js (al final de este archivo).
+-->
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nóminas · Consulta de vigencia</title>
+    <!-- Ícono vacío: evita que el navegador pida /favicon.ico y registre un 404 -->
+    <link rel="icon" href="data:,">
+</head>
+
+<body>
+
+    <!-- Barra superior: título y botón para sincronizar el Excel madre (src/js/importador.js) -->
+    <header class="barra">
+        <h1>Nóminas</h1>
+        <button type="button" id="abrirImportador" class="boton boton-primario">Actualizar nómina</button>
+    </header>
+
+    <main class="layout">
+
+        <!-- Panel izquierdo: búsqueda por RUT, nombre o mail (src/js/buscador.js) -->
+        <section class="panel panel-busqueda" aria-label="Búsqueda de asegurados">
+            <form id="formBusqueda" role="search">
+                <label for="busqueda">Buscar asegurado</label>
+                <input id="busqueda" type="search" autocomplete="off" autofocus
+                    placeholder="RUT, nombre o mail">
+            </form>
+            <!-- aria-live: los lectores de pantalla anuncian cuando cambia la lista -->
+            <div id="resultados" aria-live="polite"></div>
+        </section>
+
+        <!-- Panel derecho: ficha de la persona abierta (src/js/ficha.js) -->
+        <section id="ficha" class="panel panel-ficha" aria-label="Ficha del asegurado" aria-live="polite"></section>
+
+    </main>
+
+    <!-- Diálogo para subir el Excel madre (comportamiento en src/js/importador.js) -->
+    <dialog id="dialogImportar" class="dialogo" aria-labelledby="tituloImportar">
+        <form id="formImportar">
+            <h2 id="tituloImportar">Actualizar nómina</h2>
+            <p>
+                Sube el Excel madre (.xlsx). Se leerá la hoja «NOMINA ACT 2024» y se actualizará la base de datos.
+                Los meses que editaste a mano no se modifican.
+            </p>
+
+            <label for="excelFile">Archivo Excel</label>
+            <input type="file" id="excelFile" accept=".xlsx">
+
+            <!-- Progreso o error de la sincronización -->
+            <div id="estadoImportar" class="mensaje" role="status"></div>
+            <!-- Tabla con lo que cambió (meses nuevos, modificados, conflictos…) -->
+            <div id="resumenImportar"></div>
+
+            <div class="acciones">
+                <button type="button" id="cerrarImportar" class="boton">Cerrar</button>
+                <button type="submit" id="botonImportar" class="boton boton-primario">Actualizar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Diálogo para editar un mes de una persona (comportamiento en src/js/editorPago.js) -->
+    <dialog id="dialogPago" class="dialogo" aria-labelledby="tituloPago">
+        <form id="formPago">
+            <!-- Título y nombre se completan con JS al abrir el diálogo -->
+            <h2 id="tituloPago"></h2>
+            <p id="subtituloPago" class="subtitulo"></p>
+
+            <fieldset>
+                <legend>Estado del mes</legend>
+                <label class="opcion"><input type="radio" name="estado" value="pagado"> Pagado</label>
+                <label class="opcion"><input type="radio" name="estado" value="impago"> Impago</label>
+            </fieldset>
+
+            <label for="pagoMonto">Monto pagado (opcional)</label>
+            <input type="number" id="pagoMonto" min="0" step="1" inputmode="numeric">
+
+            <label for="pagoNota">Nota (opcional)</label>
+            <textarea id="pagoNota" rows="2" maxlength="255"></textarea>
+
+            <!-- Qué decía el Excel y si el mes está protegido por haber sido editado a mano -->
+            <p id="infoPago" class="ayuda"></p>
+            <!-- Error de validación o del servidor al guardar -->
+            <p id="errorPago" class="mensaje error" role="alert"></p>
+
+            <div class="acciones">
+                <button type="button" id="cancelarPago" class="boton">Cancelar</button>
+                <button type="submit" id="guardarPago" class="boton boton-primario">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script type="module" src="/src/js/main.js"></script>
+
+</body>
+
+</html>

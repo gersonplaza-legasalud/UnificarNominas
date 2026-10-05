@@ -1,0 +1,12 @@
+<?php
+
+// Copia este archivo como config/hoja.local.php (ese NO se sube al repositorio) y completa los dos valores.
+// Mientras no exista, la app funciona sin conexión con la hoja de Google.
+return [
+    // URL de la aplicación web del script de Google (Implementar → Aplicación web). Termina en /exec.
+    'url' => 'https://script.google.com/macros/s/XXXXXXXXXXXX/exec',
+
+    // Clave larga y secreta. Debe ser EXACTAMENTE la misma que la propiedad TOKEN del script de Google.
+    // Genera una con: php -r "echo bin2hex(random_bytes(24));"
+    'token' => 'cambia-esto-por-una-clave-larga-y-secreta',
+];

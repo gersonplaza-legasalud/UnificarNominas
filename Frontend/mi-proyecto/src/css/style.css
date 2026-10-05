@@ -1,0 +1,578 @@
+/*
+ * Estilos de toda la aplicación (una sola hoja, importada desde src/js/main.js).
+ *
+ * Secciones, en orden: variables · barra superior · layout · formularios y botones ·
+ * mensajes · resultados · insignias de estado · ficha · grilla de meses · diálogos.
+ *
+ * Los colores viven como variables en :root. Los tres estados de un mes/persona usan
+ * siempre la misma pareja fondo/texto: verde = pagado/vigente, rojo = impago/no vigente,
+ * amarillo = van a corte, gris = sin datos.
+ */
+
+:root {
+    --fondo: #f4f6f8;
+    --superficie: #ffffff;
+    --borde: #d9dee4;
+    --texto: #1c2733;
+    --texto-suave: #5b6876;
+    --primario: #1f5fbf;
+    --primario-oscuro: #184b98;
+
+    --pagado-fondo: #dff3e4;
+    --pagado-texto: #14662b;
+    --impago-fondo: #fbe0e0;
+    --impago-texto: #9a1c1c;
+    --corte-fondo: #fdf0cf;
+    --corte-texto: #7a5300;
+    --nodatos-fondo: #f0f2f4;
+    --nodatos-texto: #8b95a1;
+
+    --radio: 8px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--texto);
+    background: var(--fondo);
+}
+
+h1, h2, h3, h4 {
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* ---------- barra superior ---------- */
+
+.barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--superficie);
+    border-bottom: 1px solid var(--borde);
+}
+
+.barra h1 {
+    font-size: 1.25rem;
+}
+
+/* ---------- layout ---------- */
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) 1fr;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 24px;
+    align-items: start;
+}
+
+.panel {
+    padding: 20px;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+}
+
+.panel-busqueda {
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+#resultados {
+    overflow-y: auto;
+    margin-top: 12px;
+}
+
+@media (max-width: 800px) {
+    .layout {
+        grid-template-columns: 1fr;
+        padding: 0 12px;
+    }
+
+    .panel-busqueda {
+        position: static;
+        max-height: none;
+    }
+
+    .barra {
+        padding: 12px;
+    }
+}
+
+/* ---------- formularios y botones ---------- */
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+input[type="search"],
+input[type="number"],
+input[type="file"],
+textarea {
+    width: 100%;
+    margin-bottom: 14px;
+    padding: 9px 10px;
+    font: inherit;
+    color: inherit;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+}
+
+#formBusqueda input {
+    margin-bottom: 0;
+}
+
+:focus-visible {
+    outline: 3px solid rgba(31, 95, 191, 0.45);
+    outline-offset: 1px;
+}
+
+.boton {
+    padding: 9px 16px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--texto);
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.boton:hover:not(:disabled) {
+    background: var(--fondo);
+}
+
+.boton-primario {
+    color: #fff;
+    background: var(--primario);
+    border-color: var(--primario);
+}
+
+.boton-primario:hover:not(:disabled) {
+    background: var(--primario-oscuro);
+}
+
+.boton:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.enlace {
+    padding: 0;
+    font: inherit;
+    color: var(--primario);
+    text-align: left;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.enlace:hover {
+    text-decoration: underline;
+}
+
+fieldset {
+    margin: 0 0 14px;
+    padding: 0;
+    border: 0;
+}
+
+legend {
+    padding: 0;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.opcion {
+    display: inline-block;
+    margin-right: 18px;
+    font-weight: 400;
+}
+
+/* ---------- mensajes ---------- */
+
+.mensaje {
+    margin: 0;
+    color: var(--texto-suave);
+}
+
+.mensaje.error {
+    color: var(--impago-texto);
+}
+
+.mensaje.exito {
+    color: var(--pagado-texto);
+    font-weight: 600;
+}
+
+.ayuda {
+    margin: 4px 0 10px;
+    font-size: 0.875rem;
+    color: var(--texto-suave);
+}
+
+.conteo {
+    margin: 0 0 8px;
+    font-size: 0.875rem;
+    color: var(--texto-suave);
+}
+
+/* ---------- resultados ---------- */
+
+.lista-resultados {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.resultado {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 8px;
+    width: 100%;
+    padding: 10px;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    border: 1px solid transparent;
+    border-bottom-color: var(--borde);
+    cursor: pointer;
+}
+
+.resultado:hover,
+.resultado[aria-current="true"] {
+    background: #eef3fb;
+}
+
+.resultado[aria-current="true"] {
+    border-color: var(--primario);
+    border-radius: 6px;
+}
+
+.resultado-nombre {
+    font-weight: 600;
+}
+
+.resultado-detalle {
+    grid-column: 1;
+    font-size: 0.8125rem;
+    color: var(--texto-suave);
+}
+
+.resultado .insignia {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+/* ---------- insignias de estado ---------- */
+
+.insignia {
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    border-radius: 999px;
+}
+
+.insignia-vigente {
+    color: var(--pagado-texto);
+    background: var(--pagado-fondo);
+}
+
+.insignia-corte {
+    color: var(--corte-texto);
+    background: var(--corte-fondo);
+}
+
+.insignia-novigente {
+    color: var(--impago-texto);
+    background: var(--impago-fondo);
+}
+
+/* ---------- ficha ---------- */
+
+.ficha-cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ficha-cabecera h2 {
+    font-size: 1.35rem;
+}
+
+.ficha-cabecera .insignia {
+    font-size: 0.875rem;
+    padding: 4px 14px;
+}
+
+.rut {
+    margin: 4px 0 0;
+    color: var(--texto-suave);
+}
+
+.aviso-dv {
+    color: var(--corte-texto);
+}
+
+/* Aviso destacado tras una edición que cambió la vigencia de la persona */
+.aviso-estado {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    font-weight: 600;
+    color: var(--corte-texto);
+    background: var(--corte-fondo);
+    border-radius: 6px;
+}
+
+.nota-estado {
+    margin: 8px 0 0;
+    font-size: 0.875rem;
+    color: var(--texto-suave);
+}
+
+.sin-pago {
+    margin: 14px 0;
+    padding: 8px 12px;
+    background: var(--nodatos-fondo);
+    border-radius: 6px;
+}
+
+.sin-pago-critico {
+    color: var(--impago-texto);
+    background: var(--impago-fondo);
+    font-weight: 600;
+}
+
+.datos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px 20px;
+    margin: 0 0 20px;
+}
+
+.dato dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--texto-suave);
+}
+
+.dato dd {
+    margin: 2px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.vacio-texto {
+    color: var(--nodatos-texto);
+}
+
+.paga-por,
+.pagos {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--borde);
+}
+
+.paga-por h3,
+.pagos h3 {
+    font-size: 1rem;
+}
+
+.paga-por ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 6px 16px;
+    max-height: 220px;
+    margin: 8px 0 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.paga-por li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+/* ---------- grilla de meses ---------- */
+
+.leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0 0 12px;
+    padding: 0;
+    font-size: 0.8125rem;
+    list-style: none;
+    color: var(--texto-suave);
+}
+
+.leyenda li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.muestra {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+}
+
+.muestra.pagado { background: var(--pagado-fondo); border: 1px solid var(--pagado-texto); }
+.muestra.impago { background: var(--impago-fondo); border: 1px solid var(--impago-texto); }
+.muestra.sin-datos { background: var(--nodatos-fondo); border: 1px dashed var(--nodatos-texto); }
+
+.marca-editado {
+    width: 8px;
+    height: 8px;
+    background: var(--primario);
+    border-radius: 50%;
+}
+
+.anio {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.anio h4 {
+    font-size: 0.9rem;
+    color: var(--texto-suave);
+}
+
+.meses {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.mes {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 2px;
+    font: inherit;
+    font-size: 0.75rem;
+    line-height: 1.25;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.mes-nombre {
+    font-weight: 700;
+}
+
+.mes-valor {
+    font-size: 0.6875rem;
+}
+
+.mes.pagado { color: var(--pagado-texto); background: var(--pagado-fondo); }
+.mes.impago { color: var(--impago-texto); background: var(--impago-fondo); }
+.mes.sin-datos { color: var(--nodatos-texto); background: var(--nodatos-fondo); border: 1px dashed var(--borde); }
+
+.mes:hover {
+    border-color: var(--primario);
+}
+
+.mes.editado::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    background: var(--primario);
+    border-radius: 50%;
+}
+
+@media (max-width: 800px) {
+    .meses {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .anio {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+}
+
+/* ---------- diálogos ---------- */
+
+.dialogo {
+    width: min(480px, calc(100vw - 24px));
+    padding: 24px;
+    color: var(--texto);
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+}
+
+.dialogo::backdrop {
+    background: rgba(20, 30, 45, 0.45);
+}
+
+.dialogo h2 {
+    font-size: 1.15rem;
+}
+
+.dialogo p {
+    margin: 8px 0 14px;
+}
+
+.dialogo .subtitulo {
+    margin-top: 2px;
+    color: var(--texto-suave);
+}
+
+.acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.resumen-importacion {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 16px;
+    margin: 12px 0 0;
+}
+
+.resumen-importacion dt {
+    color: var(--texto-suave);
+}
+
+.resumen-importacion dd {
+    margin: 0;
+    font-weight: 700;
+    text-align: right;
+}
