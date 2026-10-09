@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<!--
+    Página pública de verificación de vigencia: es a donde lleva el QR del certificado.
+    Lee ?rut=...&k=... de la URL, consulta api/verificar.php y muestra el estado (src/js/verificar.js).
+-->
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de vigencia</title>
+    <link rel="icon" href="data:,">
+</head>
+
+<body class="verificacion">
+    <main class="verif-tarjeta">
+        <h1>Verificación de vigencia</h1>
+        <div id="resultado" aria-live="polite"></div>
+    </main>
+    <script type="module" src="/src/js/verificar.js"></script>
+</body>
+
+</html>

@@ -9,7 +9,8 @@
  * mensaje listo para mostrar al usuario.
  */
 
-const BASE = "http://localhost/UnificarNominas/Backend/api";
+// VITE_API_BASE permite apuntar a otra dirección (p. ej. "/api" en la build pública del túnel)
+const BASE = import.meta.env.VITE_API_BASE ?? "http://localhost/UnificarNominas/Backend/api";
 
 /**
  * Hace la petición y unifica el manejo de errores de todos los endpoints:
@@ -59,8 +60,55 @@ export function obtenerAsegurado(rut) {
 }
 
 /**
- * Edita o crea el pago de un mes → POST pago.php (JSON)
- * @param {{rut:number, periodo:string, pagado:boolean, monto:?number, nota:?string}} datos
+ * Estado de vigencia para quien escanea el QR del certificado → GET verificar.php (público).
+ * @param {number|string} poliza  id de la póliza del certificado
+ * @param {string} codigo         código `k` del enlace (lo emite asegurado.php)
+ */
+export function verificarVigencia(poliza, codigo) {
+    return pedir(`${BASE}/verificar.php?poliza=${encodeURIComponent(poliza)}&k=${encodeURIComponent(codigo)}`);
+}
+
+/**
+ * Listas para los formularios (productos, coberturas, medios de pago y pólizas matrices) → GET catalogos.php.
+ * Cambian muy poco: se piden una sola vez y se reutilizan.
+ */
+let catalogos = null;
+export function obtenerCatalogos() {
+    catalogos ??= pedir(`${BASE}/catalogos.php`).catch((error) => {
+        catalogos = null; // si falla, la próxima vez se vuelve a intentar
+        throw error;
+    });
+    return catalogos;
+}
+
+/**
+ * Crea o edita una póliza → POST poliza.php (JSON). Con `id` edita esa póliza; con `rut` crea una nueva.
+ * @param {object} datos  ver el encabezado de Backend/api/poliza.php
+ */
+export function guardarPoliza(datos) {
+    return pedir(`${BASE}/poliza.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+    });
+}
+
+/**
+ * Edita los datos de una persona (contacto, especialidad, otro tipo, sociedad) → POST persona.php (JSON).
+ * Responde también con el producto que le corresponde por su especialidad y los que tiene hoy.
+ * @param {object} datos  ver el encabezado de Backend/api/persona.php
+ */
+export function guardarPersona(datos) {
+    return pedir(`${BASE}/persona.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+    });
+}
+
+/**
+ * Edita o crea el pago de un mes de una póliza → POST pago.php (JSON)
+ * @param {{poliza_id:number, periodo:string, pagado:boolean, monto:?number, nota:?string}} datos
  */
 export function guardarPago(datos) {
     return pedir(`${BASE}/pago.php`, {
@@ -70,14 +118,15 @@ export function guardarPago(datos) {
     });
 }
 
+
 /**
- * Sube el Excel madre para sincronizar la base de datos → POST importar.php (multipart).
- * Puede tardar cerca de un minuto. Responde con `resumen` (cantidad de meses nuevos,
- * modificados, sin cambios, en conflicto…).
- * @param {File} archivo
+ * Crea un cliente (persona) nuevo → POST cliente.php (JSON). Responde con el RUT y el producto que le corresponde.
+ * @param {object} datos  ver el encabezado de Backend/api/cliente.php
  */
-export function importarNomina(archivo) {
-    const formData = new FormData();
-    formData.append("archivo", archivo);
-    return pedir(`${BASE}/importar.php`, { method: "POST", body: formData });
+export function crearCliente(datos) {
+    return pedir(`${BASE}/cliente.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+    });
 }

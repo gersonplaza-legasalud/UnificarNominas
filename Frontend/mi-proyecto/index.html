@@ -16,10 +16,11 @@
 
 <body>
 
-    <!-- Barra superior: título y botón para sincronizar el Excel madre (src/js/importador.js) -->
+    <!-- Barra superior con el título -->
     <header class="barra">
         <h1>Nóminas</h1>
-        <button type="button" id="abrirImportador" class="boton boton-primario">Actualizar nómina</button>
+        <!-- Abre el formulario de cliente nuevo (src/js/editorCliente.js) -->
+        <button type="button" id="botonNuevoCliente" class="boton boton-primario">Nuevo cliente</button>
     </header>
 
     <main class="layout">
@@ -40,28 +41,19 @@
 
     </main>
 
-    <!-- Diálogo para subir el Excel madre (comportamiento en src/js/importador.js) -->
-    <dialog id="dialogImportar" class="dialogo" aria-labelledby="tituloImportar">
-        <form id="formImportar">
-            <h2 id="tituloImportar">Actualizar nómina</h2>
-            <p>
-                Sube el Excel madre (.xlsx). Se leerá la hoja «NOMINA ACT 2024» y se actualizará la base de datos.
-                Los meses que editaste a mano no se modifican.
-            </p>
+    <!-- Diálogo para editar los datos de una persona; el formulario lo arma src/js/editorPersona.js -->
+    <dialog id="dialogPersona" class="dialogo dialogo-ancho" aria-label="Persona">
+        <form id="formPersona"></form>
+    </dialog>
 
-            <label for="excelFile">Archivo Excel</label>
-            <input type="file" id="excelFile" accept=".xlsx">
+    <!-- Diálogo para crear un cliente nuevo; el formulario lo arma src/js/editorCliente.js -->
+    <dialog id="dialogCliente" class="dialogo dialogo-ancho" aria-label="Cliente nuevo">
+        <form id="formCliente"></form>
+    </dialog>
 
-            <!-- Progreso o error de la sincronización -->
-            <div id="estadoImportar" class="mensaje" role="status"></div>
-            <!-- Tabla con lo que cambió (meses nuevos, modificados, conflictos…) -->
-            <div id="resumenImportar"></div>
-
-            <div class="acciones">
-                <button type="button" id="cerrarImportar" class="boton">Cerrar</button>
-                <button type="submit" id="botonImportar" class="boton boton-primario">Actualizar</button>
-            </div>
-        </form>
+    <!-- Diálogo para editar o agregar una póliza; el formulario lo arma src/js/editorPoliza.js -->
+    <dialog id="dialogPoliza" class="dialogo dialogo-ancho" aria-label="Póliza">
+        <form id="formPoliza"></form>
     </dialog>
 
     <!-- Diálogo para editar un mes de una persona (comportamiento en src/js/editorPago.js) -->

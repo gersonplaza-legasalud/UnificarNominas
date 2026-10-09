@@ -9,17 +9,23 @@
 
 import { buscar } from "./api.js";
 import { h, vaciar } from "./dom.js";
+import { nombreProducto } from "./formato.js";
 
 const MIN_CARACTERES = 3; // igual que el mínimo que exige la API
 const ESPERA_MS = 300;    // pausa tras dejar de teclear antes de buscar
 
 /** Estado de la nómina → sufijo de clase CSS (colores de la insignia). */
 export const claseEstado = (estado) =>
-    ({ VIGENTE: "vigente", "VAN A CORTE": "corte", "NO VIGENTE": "novigente" })[estado] ?? "novigente";
+    ({ VIGENTE: "vigente", "NO VIGENTE": "novigente" })[estado] ?? "novigente";
 
-/** Etiqueta de color con el estado (verde / amarillo / rojo). También la usa la ficha. */
+/** Etiqueta de color con el estado (verde / rojo). También la usa la ficha. */
 export function insigniaEstado(estado) {
     return h("span", { class: `insignia insignia-${claseEstado(estado)}` }, estado);
+}
+
+/** Aviso amarillo "Va a corte": no es un estado, la póliza sigue VIGENTE pero hay riesgo de que se corte. */
+export function avisoCorte() {
+    return h("span", { class: "insignia insignia-corte", title: "Sigue vigente, pero hay riesgo de que se corte" }, "Va a corte");
 }
 
 /**
@@ -97,10 +103,16 @@ export function iniciarBuscador({ formulario, input, contenedor, alSeleccionar }
                             "aria-current": r.rut === seleccionado ? "true" : null,
                             onclick: () => alSeleccionar(r.rut),
                         },
-                            h("span", { class: "resultado-nombre" }, r.nombre),
+                            h("span", { class: "resultado-nombre" }, r.nombre,
+                                r.con_siniestro ? h("span", { class: "insignia insignia-siniestro" }, "Con siniestro") : null),
                             h("span", { class: "resultado-detalle" },
-                                [r.rut_formateado, r.cobertura, r.medio_pago].filter(Boolean).join(" · ")),
-                            insigniaEstado(r.estado))))));
+                                [r.rut_formateado, r.especialidad, r.tipo_individuo].filter(Boolean).join(" · ")),
+                            // Una insignia por póliza (con su producto si la persona tiene varias)
+                            h("span", { class: "resultado-polizas" }, r.polizas.map((z) =>
+                                h("span", { class: "resultado-poliza" },
+                                    r.polizas.length > 1 ? h("span", { class: "resultado-producto" }, nombreProducto(z.producto) ?? "--") : null,
+                                    insigniaEstado(z.estado),
+                                    z.va_a_corte ? avisoCorte() : null))))))));
     }
 
     // Al teclear: se reinicia la espera y se busca cuando el usuario hace una pausa

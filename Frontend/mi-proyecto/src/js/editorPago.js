@@ -24,7 +24,7 @@ const info = document.getElementById("infoPago");
 const error = document.getElementById("errorPago");
 const botonGuardar = document.getElementById("guardarPago");
 
-// Mes que se está editando: { rut, nombre, periodo, pago, alGuardar }
+// Mes que se está editando: { polizaId, nombre, periodo, pago, alGuardar }
 let contexto = null;
 
 document.getElementById("cancelarPago").addEventListener("click", () => dialogo.close());
@@ -44,10 +44,11 @@ function descripcionOrigen(pago) {
 
 /**
  * Abre el diálogo para un mes concreto.
- * @param {{rut:number, nombre:string, periodo:string, pago:object|null}} ctx
- *        `periodo` es "AAAA-MM"; `pago` son los datos actuales del mes o null si no tiene
+ * @param {{polizaId:number, nombre:string, periodo:string, pago:object|null}} ctx
+ *        `polizaId` es la póliza a la que pertenece el mes; `periodo` es "AAAA-MM"; `pago` son los datos
+ *        actuales del mes o null si no tiene
  * @param {(respuesta: object) => void} alGuardar  se llama tras guardar con éxito, con la respuesta de
- *        la API (incluye `estado`: si la persona pasó a NO VIGENTE por este cambio). La ficha lo usa
+ *        la API (incluye `estado`: si la póliza pasó a NO VIGENTE por este cambio). La ficha lo usa
  *        para recargarse y avisar.
  */
 export function abrirEditor(ctx, alGuardar) {
@@ -84,7 +85,7 @@ formulario.addEventListener("submit", async (evento) => {
     botonGuardar.disabled = true;
     try {
         const respuesta = await guardarPago({
-            rut: contexto.rut,
+            poliza_id: contexto.polizaId,
             periodo: contexto.periodo,
             pagado: formulario.elements.estado.value === "pagado",
             monto,

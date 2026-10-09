@@ -66,6 +66,10 @@ h1, h2, h3, h4 {
 
 /* ---------- layout ---------- */
 
+.barra .boton {
+    flex: none;
+}
+
 .layout {
     display: grid;
     grid-template-columns: minmax(280px, 360px) 1fr;
@@ -122,7 +126,10 @@ label {
 
 input[type="search"],
 input[type="number"],
+input[type="text"],
+input[type="date"],
 input[type="file"],
+select,
 textarea {
     width: 100%;
     margin-bottom: 14px;
@@ -152,6 +159,7 @@ textarea {
     border: 1px solid var(--borde);
     border-radius: 6px;
     cursor: pointer;
+    text-decoration: none; /* también se usa en enlaces (<a class="boton">) */
 }
 
 .boton:hover:not(:disabled) {
@@ -267,7 +275,18 @@ legend {
 }
 
 .resultado-nombre {
+    /* el nombre y, debajo, la insignia "Con siniestro" (compacta y alineada a la izquierda con el nombre) */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
     font-weight: 600;
+}
+
+.resultado-nombre .insignia {
+    padding: 1px 8px;
+    font-size: 0.7rem;
+    line-height: 1.3;
 }
 
 .resultado-detalle {
@@ -276,10 +295,26 @@ legend {
     color: var(--texto-suave);
 }
 
-.resultado .insignia {
+/* Una insignia de estado por póliza (con su producto cuando la persona tiene varias) */
+.resultado-polizas {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: center;
+}
+
+.resultado-poliza {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.resultado-producto {
+    font-size: 0.75rem;
+    color: var(--texto-suave);
 }
 
 /* ---------- insignias de estado ---------- */
@@ -303,6 +338,26 @@ legend {
     background: var(--corte-fondo);
 }
 
+.nota-corte {
+    margin: 8px 0 0;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    color: var(--corte-texto);
+    background: var(--corte-fondo);
+    border-radius: var(--radio);
+}
+
+.casilla {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.insignia-siniestro {
+    color: #5b2a86;
+    background: #efe4f8;
+}
+
 .insignia-novigente {
     color: var(--impago-texto);
     background: var(--impago-fondo);
@@ -314,6 +369,12 @@ legend {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    gap: 12px;
+}
+
+.ficha-acciones {
+    display: flex;
+    align-items: center;
     gap: 12px;
 }
 
@@ -386,6 +447,55 @@ legend {
 
 .vacio-texto {
     color: var(--nodatos-texto);
+}
+
+/* Cada póliza de la persona va en su propio recuadro, con su estado y sus pagos */
+.poliza {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+}
+
+.poliza-cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.poliza-cabecera h3 {
+    font-size: 1.1rem;
+}
+
+.poliza-cabecera .insignia {
+    font-size: 0.875rem;
+    padding: 4px 14px;
+}
+
+.poliza-sub {
+    margin: 4px 0 0;
+    font-size: 0.875rem;
+    color: var(--texto-suave);
+}
+
+/* Póliza minimizada: solo producto, cobertura y pagos por mes */
+.solo-min {
+    display: none;
+}
+
+.poliza.minimizada .solo-min {
+    display: block;
+}
+
+.poliza.minimizada .ficha-acciones > :not(.insignia):not(.alternar),
+.poliza.minimizada :is(.nota-estado, .nota-corte, .sin-pago, .datos, .pagos-titulo, .pagos .ayuda) {
+    display: none;
+}
+
+.pagos-titulo {
+    font-size: 1rem;
 }
 
 .paga-por,
@@ -560,19 +670,96 @@ legend {
     margin-top: 18px;
 }
 
-.resumen-importacion {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 4px 16px;
-    margin: 12px 0 0;
+/* ---------- página pública de verificación (verificar.html) ---------- */
+
+.verificacion {
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
 }
 
-.resumen-importacion dt {
-    color: var(--texto-suave);
+.verif-tarjeta {
+    width: 100%;
+    max-width: 480px;
+    padding: 24px;
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
 }
 
-.resumen-importacion dd {
+.verif-tarjeta h1 {
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+}
+
+.verif-estado {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.verif-estado p {
     margin: 0;
+    font-size: 1.05rem;
     font-weight: 700;
-    text-align: right;
+}
+
+/* ---------- diálogo de póliza (editar / agregar) ---------- */
+
+.dialogo-ancho {
+    width: min(760px, calc(100vw - 24px));
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+}
+
+.campos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+}
+
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+.campos .ayuda {
+    margin-top: -6px;
+}
+
+/* Aviso de qué póliza le corresponde a la persona según su especialidad */
+.aviso-producto {
+    margin: 0 0 14px;
+    padding: 8px 12px;
+    color: var(--pagado-texto);
+    background: var(--pagado-fondo);
+    border-radius: 6px;
+}
+
+.aviso-producto-alerta {
+    color: var(--corte-texto);
+    background: var(--corte-fondo);
+}
+
+@media (max-width: 560px) {
+    .campos {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Ayuda de la prima sugerida (junto al botón "Usar este valor") */
+.ayuda-prima {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.ayuda-prima .ayuda {
+    margin: 0;
+}
+
+.boton-chico {
+    padding: 2px 10px;
+    font-size: 0.8125rem;
 }

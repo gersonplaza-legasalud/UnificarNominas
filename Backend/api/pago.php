@@ -3,30 +3,35 @@
 /**
  * POST api/pago.php   (cuerpo JSON)
  *
- *   { "rut": 7779582, "periodo": "2026-09", "pagado": true, "monto": 33700, "nota": "texto" }
+ *   { "poliza_id": 918, "periodo": "2026-09", "pagado": true, "monto": 33700, "nota": "texto" }
  *
- * Edita (o crea) el pago de UN mes de una persona; lo usa el diálogo "Editar mes" del front.
+ * Edita (o crea) el pago de UN mes de UNA póliza; lo usa el diálogo "Editar mes" del front.
+ * Una persona puede tener varias pólizas, cada una con sus propios pagos y su propio estado.
  *   - `monto` y `nota` son opcionales (null o vacío = sin dato).
  *   - Si el mes ya existía lo actualiza; si no, lo crea.
  *   - Lo marca como editado a mano (`editado = 1`, `origen = 'manual'`), y por eso la
  *     sincronización con el Excel madre ya no lo sobrescribe.
  *   - Cada campo que cambia se registra en `historial_cambios` (valor anterior y nuevo).
  *   - Si los datos enviados son idénticos a los guardados responde "Sin cambios" y no escribe nada.
- *   - Pérdida de cobertura: si el mes quedó impago y con eso la persona acumula 3 meses seguidos
- *     sin pago (ver App\Services\Vigencia), pasa de VIGENTE / VAN A CORTE a NO VIGENTE. El cambio
+ *   - Pérdida de cobertura: si el mes quedó impago y con eso la póliza acumula 2 meses seguidos
+ *     sin pago (ver App\Services\Vigencia), pasa de VIGENTE a NO VIGENTE. Con 1 solo mes sin pago sigue
+ *     VIGENTE y se enciende el aviso de corte (`va_a_corte`), que se puede quitar a mano porque hay
+ *     excepciones; un mes pagado que deja la póliza al día lo apaga. El cambio
  *     se marca (`estado_manual = 1`) para que la próxima sincronización con el Excel no lo
  *     revierta, y se registra en `historial_cambios`. Solo baja de estado: marcar un mes como
  *     pagado nunca vuelve a dejar vigente a nadie.
  *
  *   - Hoja de Google: si la conexión está configurada (config/hoja.php), el cambio también se
- *     escribe en la celda de la hoja (y la columna ESTADO si la persona pasó a NO VIGENTE) a
+ *     escribe en la celda de la hoja (y la columna ESTADO si la póliza pasó a NO VIGENTE) a
  *     través de una cola con reintentos (App\Services\HojaGoogle). Si la hoja no responde, la
- *     edición igual queda guardada en la base y el envío se reintenta solo.
+ *     edición igual queda guardada en la base y el envío se reintenta solo. La hoja solo
+ *     representa las pólizas del Excel madre (producto Odontólogo): para las demás la respuesta
+ *     es 'no_aplica' y nada se envía.
  *
  * Responde: { success, message, pago: {...}, estado: {cambio, anterior, nuevo}, hoja }
  *   pago   = el mes tal como quedó guardado en la base
- *   estado = qué pasó con la vigencia de la persona (cambio = true si acaba de pasar a NO VIGENTE)
- *   hoja   = 'desactivada' | 'enviado' | 'pendiente' (en cola, se reintentará) | 'fallido' (rechazado)
+ *   estado = qué pasó con la vigencia de la póliza (cambio = true si acaba de pasar a NO VIGENTE)
+ *   hoja   = 'desactivada' | 'no_aplica' | 'enviado' | 'pendiente' (en cola, se reintentará) | 'fallido' (rechazado)
  */
 
 require_once __DIR__ . '/_comun.php';
@@ -45,10 +50,10 @@ if (!is_array($in)) {
     responder(400, ['success' => false, 'message' => 'Se esperaba un JSON']);
 }
 
-$rut = filter_var($in['rut'] ?? null, FILTER_VALIDATE_INT);
+$polizaId = filter_var($in['poliza_id'] ?? null, FILTER_VALIDATE_INT);
 $periodo = (string) ($in['periodo'] ?? '');
-if (!$rut || $rut <= 0 || !preg_match('/^(20\d\d|19\d\d)-(0[1-9]|1[0-2])$/', $periodo)) {
-    responder(400, ['success' => false, 'message' => 'RUT o período inválido']);
+if (!$polizaId || $polizaId <= 0 || !preg_match('/^(20\d\d|19\d\d)-(0[1-9]|1[0-2])$/', $periodo)) {
+    responder(400, ['success' => false, 'message' => 'Póliza o período inválido']);
 }
 // is_bool estricto: "si", 1 o "true" como texto no valen
 if (!is_bool($in['pagado'] ?? null)) {
@@ -71,37 +76,43 @@ if ($nota !== null && mb_strlen($nota) > 255) {
 $pagado = (int) $in['pagado'];
 $fecha = $periodo . '-01'; // la base guarda el primer día del mes
 
-conManejoDeErrores(function () use ($rut, $fecha, $periodo, $pagado, $monto, $nota) {
+conManejoDeErrores(function () use ($polizaId, $fecha, $periodo, $pagado, $monto, $nota) {
     $pdo = conectarBD();
 
-    $existe = $pdo->prepare('SELECT 1 FROM asegurados WHERE rut = ?');
-    $existe->execute([$rut]);
-    if (!$existe->fetchColumn()) {
-        responder(404, ['success' => false, 'message' => 'No existe un asegurado con ese RUT']);
+    $existe = $pdo->prepare(
+        'SELECT z.rut, pr.nombre AS producto FROM polizas z LEFT JOIN productos pr ON pr.id = z.producto_id WHERE z.id = ?'
+    );
+    $existe->execute([$polizaId]);
+    $poliza = $existe->fetch();
+    if (!$poliza) {
+        responder(404, ['success' => false, 'message' => 'No existe esa póliza']);
     }
+    $rut = (int) $poliza['rut'];
+    $esMadre = $poliza['producto'] === PRODUCTO_MADRE;
 
     // Transacción: el cambio del pago y su registro en el historial se guardan juntos o no se guardan
     $pdo->beginTransaction();
 
     // FOR UPDATE bloquea la fila mientras dura la transacción, para que dos ediciones
     // simultáneas del mismo mes no se pisen
-    $stmt = $pdo->prepare('SELECT id, pagado, monto, nota FROM pagos_mensuales WHERE rut = ? AND periodo = ? FOR UPDATE');
-    $stmt->execute([$rut, $fecha]);
+    $stmt = $pdo->prepare('SELECT id, pagado, monto, nota FROM pagos_mensuales WHERE poliza_id = ? AND periodo = ? FOR UPDATE');
+    $stmt->execute([$polizaId, $fecha]);
     $actual = $stmt->fetch();
 
     $log = $pdo->prepare(
         "INSERT INTO historial_cambios (tabla, registro, campo, valor_anterior, valor_nuevo, usuario)
          VALUES ('pagos_mensuales', ?, ?, ?, ?, 'front')"
     );
-    // Misma clave "rut|periodo" que usa la sincronización, para ver todo el historial de un mes junto
-    $registro = "$rut|$fecha";
+    // Para las pólizas del Excel madre es la misma clave que usa la sincronización, para ver todo el
+    // historial de un mes junto; las demás llevan además el id de póliza
+    $registro = claveMes($rut, $fecha, $polizaId, $esMadre);
 
     if ($actual === false) {
         // El mes no existía (ej. un mes sin datos): se crea
         $pdo->prepare(
-            "INSERT INTO pagos_mensuales (rut, periodo, pagado, monto, origen, editado, nota)
+            "INSERT INTO pagos_mensuales (poliza_id, periodo, pagado, monto, origen, editado, nota)
              VALUES (?, ?, ?, ?, 'manual', 1, ?)"
-        )->execute([$rut, $fecha, $pagado, $monto, $nota]);
+        )->execute([$polizaId, $fecha, $pagado, $monto, $nota]);
         $log->execute([$registro, 'pagado', null, (string) $pagado]);
         $cambio = true;
         $notaCambio = $nota !== null;
@@ -129,15 +140,17 @@ conManejoDeErrores(function () use ($rut, $fecha, $periodo, $pagado, $monto, $no
     }
 
     // ---- Pérdida de cobertura: solo se evalúa si el mes quedó impago y el dato cambió ----
-    $cambioEstado = ['cambio' => false, 'anterior' => null, 'nuevo' => null];
+    $cambioEstado = ['cambio' => false, 'anterior' => null, 'nuevo' => null, 'aviso_corte' => false];
     if ($cambio && $pagado === 0) {
-        $cambioEstado = aplicarPerdidaDeCobertura($pdo, $rut, $periodo);
+        $cambioEstado = aplicarPerdidaDeCobertura($pdo, $polizaId, $periodo);
+    } elseif ($cambio && $pagado === 1) {
+        $cambioEstado = apagarAvisoSiAlDia($pdo, $polizaId);
     }
 
     $pdo->commit();
 
     // ---- Reflejar el cambio en la hoja de Google (si la conexión está configurada) ----
-    $estadoHoja = enviarAHoja($pdo, $cambio, [
+    $estadoHoja = !$esMadre ? 'no_aplica' : enviarAHoja($pdo, $cambio, [
         'rut' => $rut,
         'periodo' => $periodo,
         'valor' => valorParaHoja($pagado, $monto),
@@ -147,13 +160,14 @@ conManejoDeErrores(function () use ($rut, $fecha, $periodo, $pagado, $monto, $no
     ]);
 
     // Se vuelve a leer el mes para devolver exactamente lo que quedó guardado
-    $stmt = $pdo->prepare('SELECT pagado, monto, valor_original, nota, editado, origen FROM pagos_mensuales WHERE rut = ? AND periodo = ?');
-    $stmt->execute([$rut, $fecha]);
+    $stmt = $pdo->prepare('SELECT pagado, monto, valor_original, nota, editado, origen FROM pagos_mensuales WHERE poliza_id = ? AND periodo = ?');
+    $stmt->execute([$polizaId, $fecha]);
     $p = $stmt->fetch();
 
     responder(200, [
         'success' => true,
         'message' => $cambio ? 'Mes actualizado' : 'Sin cambios',
+        'poliza_id' => $polizaId,
         'pago' => [
             'periodo' => $periodo,
             'pagado' => (bool) $p['pagado'],
@@ -164,7 +178,8 @@ conManejoDeErrores(function () use ($rut, $fecha, $periodo, $pagado, $monto, $no
             'origen' => $p['origen'],
         ],
         'estado' => $cambioEstado,
-        // 'desactivada' (sin conexión configurada), 'enviado' o 'pendiente' (se reintentará solo)
+        // 'desactivada' (sin conexión configurada), 'no_aplica' (póliza que no está en la hoja),
+        // 'enviado' o 'pendiente' (se reintentará solo)
         'hoja' => $estadoHoja,
     ]);
 });
@@ -207,42 +222,80 @@ function enviarAHoja(PDO $pdo, bool $huboCambio, array $cambio): string
 }
 
 /**
- * Pasa a la persona a NO VIGENTE si, con el mes recién marcado como impago, completa la
+ * Pasa la póliza a NO VIGENTE si, con el mes recién marcado como impago, completa la
  * racha de meses seguidos sin pago. Debe llamarse dentro de la transacción de la edición
  * (así ve el mes ya actualizado y el cambio de estado se confirma o se deshace junto con él).
  *
  * @param string $periodo  mes editado, 'AAAA-MM'
  * @return array{cambio:bool, anterior:?string, nuevo:?string}
  */
-function aplicarPerdidaDeCobertura(PDO $pdo, int $rut, string $periodo): array
+function aplicarPerdidaDeCobertura(PDO $pdo, int $polizaId, string $periodo): array
 {
-    $sinCambio = ['cambio' => false, 'anterior' => null, 'nuevo' => null];
+    $sinCambio = ['cambio' => false, 'anterior' => null, 'nuevo' => null, 'aviso_corte' => false];
 
-    // Solo los VIGENTE o VAN A CORTE pueden perder la cobertura; FOR UPDATE evita que una
+    // Solo las VIGENTE pueden perder la cobertura; FOR UPDATE evita que una
     // sincronización simultánea cambie el estado mientras se decide
-    $stmt = $pdo->prepare('SELECT estado, fecha_alta FROM asegurados WHERE rut = ? FOR UPDATE');
-    $stmt->execute([$rut]);
+    $stmt = $pdo->prepare('SELECT estado, fecha_alta, rut, producto_id, va_a_corte FROM polizas WHERE id = ? FOR UPDATE');
+    $stmt->execute([$polizaId]);
     $persona = $stmt->fetch();
     if (!$persona || $persona['estado'] === 'NO VIGENTE') {
         return $sinCambio;
     }
 
-    $stmt = $pdo->prepare('SELECT DATE_FORMAT(periodo, "%Y-%m") AS periodo, pagado FROM pagos_mensuales WHERE rut = ?');
-    $stmt->execute([$rut]);
-    $racha = Vigencia::mesesSinPago(
-        array_map('boolval', array_column($stmt->fetchAll(), 'pagado', 'periodo')),
-        $persona['fecha_alta']
-    );
+    $racha = rachaSinPago($pdo, $polizaId, $persona);
     if (!Vigencia::debePerderCobertura($racha, $periodo)) {
+        // Con 1 mes sin pago sigue vigente, pero se avisa que va a corte (si no estaba ya avisado)
+        if (Vigencia::debeAvisarCorte($racha, $periodo) && !(int) $persona['va_a_corte']) {
+            $pdo->prepare('UPDATE polizas SET va_a_corte = 1 WHERE id = ?')->execute([$polizaId]);
+            $pdo->prepare(
+                "INSERT INTO historial_cambios (tabla, registro, campo, valor_anterior, valor_nuevo, usuario)
+                 VALUES ('polizas', ?, 'va_a_corte', '0', '1', 'front')"
+            )->execute([(string) $polizaId]);
+            return ['cambio' => false, 'anterior' => null, 'nuevo' => null, 'aviso_corte' => true];
+        }
         return $sinCambio;
     }
 
-    $pdo->prepare("UPDATE asegurados SET estado = 'NO VIGENTE', estado_manual = 1, estado_calculado_at = NOW() WHERE rut = ?")
-        ->execute([$rut]);
+    $pdo->prepare("UPDATE polizas SET estado = 'NO VIGENTE', va_a_corte = 0, estado_manual = 1, estado_calculado_at = NOW() WHERE id = ?")
+        ->execute([$polizaId]);
     $pdo->prepare(
         "INSERT INTO historial_cambios (tabla, registro, campo, valor_anterior, valor_nuevo, usuario)
-         VALUES ('asegurados', ?, 'estado', ?, 'NO VIGENTE', 'front')"
-    )->execute([(string) $rut, $persona['estado']]);
+         VALUES ('polizas', ?, 'estado', ?, 'NO VIGENTE', 'front')"
+    )->execute([(string) $polizaId, $persona['estado']]);
 
-    return ['cambio' => true, 'anterior' => $persona['estado'], 'nuevo' => 'NO VIGENTE'];
+    return ['cambio' => true, 'anterior' => $persona['estado'], 'nuevo' => 'NO VIGENTE', 'aviso_corte' => false];
+}
+
+/**
+ * Racha de meses seguidos sin pago de la póliza. Se cuenta sobre todas las pólizas del mismo producto de la persona
+ * (cada una solo guarda los meses de su período).
+ */
+function rachaSinPago(PDO $pdo, int $polizaId, array $persona): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT DATE_FORMAT(p.periodo, "%Y-%m") AS periodo, MAX(p.pagado) AS pagado
+         FROM pagos_mensuales p JOIN polizas z ON z.id = p.poliza_id
+         WHERE ' . ($persona['producto_id'] !== null ? 'z.rut = ? AND z.producto_id = ?' : 'z.id = ? AND ? IS NULL') . '
+         GROUP BY periodo'
+    );
+    $stmt->execute($persona['producto_id'] !== null ? [$persona['rut'], $persona['producto_id']] : [$polizaId, null]);
+    return Vigencia::mesesSinPago(array_map('boolval', array_column($stmt->fetchAll(), 'pagado', 'periodo')), $persona['fecha_alta']);
+}
+
+/** Un mes quedó pagado: si la póliza VIGENTE ya no debe nada, se apaga su aviso de corte. */
+function apagarAvisoSiAlDia(PDO $pdo, int $polizaId): array
+{
+    $sinCambio = ['cambio' => false, 'anterior' => null, 'nuevo' => null, 'aviso_corte' => false];
+    $stmt = $pdo->prepare('SELECT estado, fecha_alta, rut, producto_id, va_a_corte FROM polizas WHERE id = ? FOR UPDATE');
+    $stmt->execute([$polizaId]);
+    $persona = $stmt->fetch();
+    if (!$persona || $persona['estado'] !== 'VIGENTE' || !(int) $persona['va_a_corte']) return $sinCambio;
+    if (rachaSinPago($pdo, $polizaId, $persona)['consecutivos'] > 0) return $sinCambio;
+
+    $pdo->prepare('UPDATE polizas SET va_a_corte = 0 WHERE id = ?')->execute([$polizaId]);
+    $pdo->prepare(
+        "INSERT INTO historial_cambios (tabla, registro, campo, valor_anterior, valor_nuevo, usuario)
+         VALUES ('polizas', ?, 'va_a_corte', '1', '0', 'front')"
+    )->execute([(string) $polizaId]);
+    return $sinCambio;
 }

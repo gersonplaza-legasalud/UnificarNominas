@@ -40,3 +40,20 @@ export function h(tag, props = {}, ...hijos) {
 export function vaciar(el) {
     el.replaceChildren();
 }
+
+/** Hace que lo que se escribe en un campo de texto quede en mayúsculas (conserva la posición del cursor). Devuelve el mismo campo. */
+export function enMayusculas(input) {
+    const pasar = () => {
+        const posicion = input.selectionStart;
+        const mayus = input.value.toLocaleUpperCase("es-CL");
+        if (mayus === input.value) return;
+        input.value = mayus;
+        input.setSelectionRange?.(posicion, posicion);
+    };
+    input.addEventListener("input", pasar);
+    pasar();
+    return input;
+}
+
+/** Valores distintos de una lista, en mayúsculas y ordenados (para las sugerencias de un campo que va todo en mayúsculas). */
+export const listaEnMayusculas = (valores) => [...new Set(valores.map((v) => String(v).toLocaleUpperCase("es-CL")))].sort((a, b) => a.localeCompare(b, "es"));

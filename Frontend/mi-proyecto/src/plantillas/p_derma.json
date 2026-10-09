@@ -1,0 +1,979 @@
+{
+    "plantilla": "P_DERMA",
+    "producto": "Derma",
+    "limite_uf": 7000,
+    "filas": [
+        {
+            "campo": "matriz"
+        },
+        {
+            "seccion": "",
+            "celdas": [
+                {
+                    "t": "COBERTURAS Y MATERIA ASEGURADA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "",
+            "celdas": [
+                {
+                    "t": "RESPONSABILIDAD CIVIL DE MEDICOS, ERRORES Y OMISIONES, POL 1 2019 0002 PARA LA ACTIVIDAD DE LOS ASEGURADOS EN LOS TERMINOS DEFINIDOS EN EL FORMULARIO\/PROPUESTA QUE FORMA PARTE INTEGRANTE DE LA POLIZA.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "campo": "vigencia"
+        },
+        {
+            "campo": "limite"
+        },
+        {
+            "seccion": "",
+            "celdas": [
+                {
+                    "t": "DEDUCIBLE",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "SIN DEDUCIBLE",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "asegurado",
+            "celdas": [
+                {
+                    "t": "ANTECEDENTES DEL ASEGURADO",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "campo": "nombre"
+        },
+        {
+            "campo": "rut"
+        },
+        {
+            "campo": "telefono"
+        },
+        {
+            "campo": "mail"
+        },
+        {
+            "campo": "especialidad"
+        },
+        {
+            "campo": "direccion"
+        },
+        {
+            "campo": "ciudad"
+        },
+        {
+            "seccion": "aseguradora",
+            "celdas": [
+                {
+                    "t": "IDENTIFICACION DE LA COMPAÑÍA  ASEGURADORA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "aseguradora",
+            "celdas": [
+                {
+                    "t": "RAZON SOCIAL",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "CHUBB   SEGUROS   CHILE S.A.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "aseguradora",
+            "celdas": [
+                {
+                    "t": "RUT",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "99.225.000-3",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "aseguradora",
+            "celdas": [
+                {
+                    "t": "DIRECCION",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "AV. PRESIDENTE RIESCO 5435 PISO 7",
+                    "b": false
+                },
+                {
+                    "t": "COMUNA :",
+                    "b": true
+                },
+                {
+                    "t": "LAS CONDES",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "aseguradora",
+            "celdas": [
+                {
+                    "t": "TELEFONO",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "800 800 068",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "ANTECEDENTES DEL CONTRATANTE",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "RAZON SOCIAL",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "COMERCIAL LEGASALUD LTDA.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "RUT",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "76.037.442-3",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "DIRECCION",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "ANTONIO BELLET  77  OFICINA 101",
+                    "b": false
+                },
+                {
+                    "t": "PROVIDENCIA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "TELEFONO",
+                    "b": true
+                },
+                {
+                    "t": ":",
+                    "b": true
+                },
+                {
+                    "t": "+56 22 6993639",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "AMPARA LA RESPONSABILIDAD CIVIL PROFESIONAL MÉDICA, PARA LOS SERVICIOS PRESTADOS POR EL ASEGURADO, DERIVADO DE UN ACTO MÉDICO NEGLIGENTE EN LA PRESTACIÓN DE SUS SERVICIOS.  QUEDA ENTENDIDO Y ACORDADO QUE LOS SERVICIOS MÉDICOS PROFESIONALES PRESTADOS POR EL ASEGURADO A TRAVÉS DE LA TELEMEDICINA, INCLUYENDO PERO NO LIMITÁNDOSE A LAS CONSULTAS MÉDICAS ONLINE, ESTÁN CUBIERTOS POR ESTE SEGURO, SIEMPRE Y CUANDO SE PRESTEN DE ACUERDO CON LA LEGISLACIÓN VIGENTE.\nSE ENTIENDE POR TELEMEDICINA EL EJERCICIO DE LA MEDICINA MEDIADO POR TECNOLOGÍAS CON FINES ASISTENCIALES, EDUCATIVOS, DE INVESTIGACIÓN, PREVENCIÓN DE ENFERMEDADES Y LESIONES Y PROMOCIÓN DE LA SALUD. TODOS LOS DEMÁS TÉRMINOS, CONDICIONES Y CLÁUSULAS DE ESTA POLÍZA PERMANECEN SIN CAMBIOS.\nSE CUBRE EL PROCEDIMIENTO DERMOESTÉTICO EN LA RELACIÓN A NEGLIGENCIAS, IGNORANCIAS O IMPRUDENCIAS DEL MÉDICO DURANTE ESTE PROCEDIMIENTO. NO SE CUBREN RESULTADOS ESTÉTICOS DEL MISMO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "FECHA DE RETROACTIVIDAD",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "AL SER UN PROGRAMA QUE TIENE VIGENCIA CON CHUBB SEGUROS CHILE S.A. (PREVIAMENTE ACE SEGUROS) DESDE FINALES DEL AÑO 2012, CON EMISIÓN DE PÓLIZAS INDIVIDUALES, Y CON EL OBJETO DE MANTENER LA CONTINUIDAD EN LA COBERTURA DE AQUELLOS ASEGURADOS QUE CONSECUTIVAMENTE, SIN EXCEPCIÓN ALGUNA, HAN MANTENIDO SUS PÓLIZAS POR CADA PERÍODO ANUAL VIGENTE HASTA ESTA FECHA, SE DEJA CONSTANCIA QUE EN CASO DE PRESENTARSE UNA RECLAMACIÓN, DE CUALQUIER ASEGURADO QUE CUMPLA CON DICHA CONDICIÓN, SE CONSIDERARÁ Y RESPETARÁ SU FECHA DE RETROACTIVIDAD ORIGINAL, MISMA QUE DEBERÁ SER RESPALDADA, CON COPIAS DE PÓLIZAS CONSECUTIVAS Y PAGADAS.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "DESDE LA PRIMERA VIGENCIA DE PÓLIZA SUSCRITA POR CHUBB SEGUROS CHILE S.A. SIEMPRE Y CUANDO SEAN VIGENCIAS CONSECUTIVAS.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "PARA NUEVOS ASEGURADOS QUE MIGREN DESDE OTRA COMPAÑÍA BAJO COBERTURA CLAIMS MADE, CHUBB RECONOCERÁ RETROACTIVIDAD HASTA LA FECHA DE INICIO DE LA PRIMERA CONTRATACIÓN, SIEMPRE QUE LAS COBERTURAS SE HAYAN MANTENIDO DE MANERA CONTINUA E ININTERRUMPIDA BAJO ESTA MODALIDAD. EN CASO DE SINIESTRO, CONSTITUIRÁ CONDICIÓN INDISPENSABLE DE COBERTURA QUE EL ASEGURADO ACREDITE LA VIGENCIA Y CONTINUIDAD MEDIANTE LAS PÓLIZAS ANTERIORES DEBIDAMENTE PAGADAS, SIN PERJUICIO DE OTROS DOCUMENTOS ADICIONALES QUE LA COMPAÑÍA PUEDA REQUERIR.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "CONDICIONES GENERALES Y PARTICULARES",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "RIGE CONDICIONADO GENERAL DE LA PÓLIZA DE RESPONSABILIDAD CIVIL MÉDICA APROBADA POR LA COMISION DEL MERCADO FINANCIERO BAJO EL CÓDIGO POL 1 2019 0002.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EL ASEGURADO DECLARA OBSERVAR LAS PRESCRIPCIONES Y REGLAMENTOS EXIGIDAS PARA EL EJERCICIO DE ESTA ACTIVIDAD.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "GASTOS DE DEFENSA Y RECLAMOS, FORMAN PARTE DEL AGREGADO ANUAL.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "SERVICIOS MÉDICOS PROFESIONALES PROPORCIONADOS EN LÍNEA (TELEMEDICINA)",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": " SERVICIOS MÉDICOS PROFESIONALES PROPORCIONADOS EN LÍNEA (TELEMEDICINA)",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "QUEDA ENTENDIDO Y ACORDADO QUE LOS SERVICIOS MÉDICOS PROFESIONALES PRESTADOS POR EL ASEGURADO A TRAVÉS DE LA TELEMEDICINA, INCLUYENDO PERO NO LIMITÁNDOSE A LAS CONSULTAS MÉDICAS ONLINE, ESTÁN CUBIERTOS POR ESTE SEGURO, SIEMPRE Y CUANDO SE PRESTEN DE ACUERDO CON LA LEGISLACIÓN VIGENTE.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "SE ENTIENDE POR TELEMEDICINA EL EJERCICIO DE LA MEDICINA MEDIADO POR TECNOLOGÍAS CON FINES ASISTENCIALES, EDUCATIVOS, DE INVESTIGACIÓN, PREVENCIÓN DE ENFERMEDADES Y LESIONES Y PROMOCIÓN DE LA SALUD.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "TODOS LOS DEMÁS TÉRMINOS, CONDICIONES Y CLÁUSULAS DE ESTA POLÍZA PERMANECEN SIN CAMBIOS.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "ACLARACIONES DE COBERTURA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "ESTA PÓLIZA NO SE APLICA A NINGÚN RECLAMO CONTRA EL ASEGURADO:",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       RELACIONADO CON RC AUTOS (INCLUYENDO ESTACIONAMIENTOS), YA QUE ESTO ES MATERIA DE OTRO TIPO DE POLIZA.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       RELACIONADOS CON LA RESPONSABILIDAD CIVIL DE PRODUCTOS, YA QUE ESTA COBERTURA ES MATERIA DE OTRA POLIZA.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       RELACIONADOS CON PRUEBAS CLÍNICAS Y MÉTODOS O PRODUCTOS NO APROBADOS POR LEY O LA CIENCIA MÉDICA, EXPOSICIÓN QUE SE MANEJA BAJO OTRO TIPO DE POLIZAS.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       RELACIONADOS CON CIRUGÍAS PLASTICAS ESTÉTICAS, TRATAMIENTOS ESTETICOS, A NO SER QUE SEAN RECONSTRUCTIVAS PRODUCTO DE ALGÚN ACCIDENTE.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       RELACIONADO CON CUALQUIER RECLAMACION ORIGINADO POR, BASADO EN O RELACIONADO DIRECTA O INDIRECTAMENTE CON UN EVENTO CIBERNETICO, INCLUYENDO PERO NO LIMITADO A LA OBTENCIÓN, MANEJO Y CUSTODIA DE DATO, DATOS PERSONALES, INFORMACION CONFIDENCIAL E HISTORIAS CLINICAS.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "PARA EFECTOS DE ESTA ÚLTIMA ACLARACIÓN SE INCLUYEN LAS SIGUIENTES DEFINICIONES:",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EVENTO CIBERNETICO:",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       UNA VIOLACIÓN DE LA SEGURIDAD DE LA RED",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       USO NO AUTORIZADO DE UNA RED INFORMÁTICA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       UN VIRUS DE COMPUTADORA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·        DAÑO, ALTERACIÓN, ROBO O DESTRUCCIÓN DE DATOS",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "DATO",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "SIGNIFICA CUALQUIER INFORMACIÓN, HECHOS O PROGRAMAS, ARCHIVADOS, CREADOS, USADOS O TRANSMITIDOS EN CUALQUIER HARDWARE O SOFTWARE QUE PERMITA FUNCIONAR A UN COMPUTADOR Y A CUALQUIERA DE SUS ACCESORIOS, INCLUYENDO SISTEMAS Y APLICACIONES DE SOFTWARE, DISCOS",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "DUROS O DISKETTES, CD-ROMS, CINTAS, MEMORIAS, CÉLULAS, DISPOSITIVOS DE PROCESAMIENTO DE DATOS, O CUALQUIER OTRO MEDIO QUE SEA UTILIZADO CON EQUIPOS CONTROLADOS ELECTRÓNICAMENTE O CUALQUIER OTRO SISTEMA DE COPIA DE SEGURIDAD. DATO NO CONSTITUYE UN BIEN TANGIBLE.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "DATOS PERSONALES SIGNIFICA:",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "A.     ",
+                    "b": false
+                },
+                {
+                    "t": "                    EL NOMBRE, NACIONALIDAD, NÚMERO DE IDENTIDAD O NÚMERO DE SEGURO SOCIAL, DATOS MÉDICOS O DE SALUD, U OTRA INFORMACIÓN SOBRE LA SALUD PROTEGIDA, NÚMERO DE LICENCIA DE CONDUCIR, NÚMERO DE IDENTIFICACIÓN ESTATAL, NÚMERO DE TARJETA DE CRÉDITO, NÚMERO DE TARJETA DÉBITO, DIRECCIÓN, TELÉFONO, DIRECCIÓN DE CORREO ELECTRÓNICO, NÚMERO DE CUENTA, HISTORIAL CONTABLE O CONTRASEÑAS; Y",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "B.     ",
+                    "b": false
+                },
+                {
+                    "t": "                   CUALQUIER INFORMACIÓN PERSONAL NO PÚBLICA COMO SE DEFINE EN LAS REGULACIONES DE PRIVACIDAD;",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "a.      ",
+                    "b": false
+                },
+                {
+                    "t": "                    EN CUALQUIER FORMATO, SI TAL INFORMACIÓN CREA LA POSIBILIDAD DE QUE UN INDIVIDUO SEA IDENTIFICADO O CONTACTADO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "MODALIDAD DE COBERTURA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "ESTA ES UNA PÓLIZA DE RECLAMOS HECHOS Y DENUNCIADOS. CON SUJECIÓN A SUS TÉRMINOS, ESTA PÓLIZA SOLAMENTE SE APLICA A TODO PRIMER RECLAMO HECHO DURANTE EL PERÍODO DE PÓLIZA SIEMPRE QUE TAL RECLAMO SEA DENUNCIADO A LOS ASEGURADORES TAN PRONTO COMO SEA PRACTICABLE PERO EN NINGÚN CASO MÁS ALLÁ DE 60 DÍAS DESPUÉS DE LA FINALIZACIÓN DEL PERÍODO DE LA PÓLIZA. LOS MONTOS INCURRIDOS COMO COSTOS, CARGOS Y GASTOS REDUCIRÁN Y PODRÁN AGOTAR EL LÍMITE DE RESPONSABILIDAD Y ESTÁN SUJETOS A LAS RETENCIONES.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "CLAUSULA ESPECIAL OFAC",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "ESTE SEGURO NO SE APLICA EN LA MEDIDA EN QUE LAS SANCIONES ECONÓMICAS O COMERCIALES U OTRAS LEYES O REGULACIONES NOS PROHÍBAN PROPORCIONAR EL SEGURO, INCLUIDO, ENTRE OTROS, EL PAGO DE RECLAMACIONES. TODOS LOS DEMÁS TÉRMINOS Y CONDICIONES DE LA PÓLIZA NO SE MODIFICAN.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "CHUBB SEGUROS CHILE S.A. ES UNA SUBSIDIARIA DE UNA CASA MATRIZ DE EE.UU. Y CHUBB LIMITED, UNA EMPRESA QUE COTIZA EN LA BOLSA DE NUEVA YORK. POR CONSIGUIENTE, CHUBB SEGUROS CHILE S.A. ESTÁ SUJETA A CIERTAS LEYES Y REGULACIONES DE ESTADOS UNIDOS (ADEMÁS DE LAS RESTRICCIONES DE SANCIONES DE LA UNIÓN EUROPEA, LAS NACIONES UNIDAS Y NACIONALES) QUE PUEDEN PROHIBIRLE LA PRESTACIÓN DE COBERTURA O EL PAGO DE RECLAMACIONES A DETERMINADAS PERSONAS O ENTIDADES O ASEGURAR CIERTOS TIPOS DE ACTIVIDADES RELACIONADAS CON DETERMINADOS PAÍSES COMO IRÁN, SIRIA, COREA DEL NORTE, SUDÁN DEL NORTE Y CUBA.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "RESOLUCIÓN DE CONTRATO POR NO PAGO DE PRIMA",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "LA COMPAÑÍA PODRÁ, EN EL EVENTO DE MORA O SIMPLE RETARDO EN EL PAGO DE TODO O PARTE DE LA PRIMA, REAJUSTES O INTERÉS, DECLARAR RESUELTO EL CONTRATO MEDIANTE CARTA DIRIGIDA AL DOMICILIO QUE EL CONTRATANTE HAYA SEÑALADO EN LA PÓLIZA.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "LA RESOLUCIÓN DEL CONTRATO OPERARÁ AL VENCIMIENTO DEL PLAZO DE QUINCE DÍAS CORRIDOS, CONTADOS DESDE LA FECHA DEL ENVÍO DE LA CARTA, A MENOS QUE ANTES DE PRODUCIRSE EL VENCIMIENTO DE ESE PLAZO SEA PAGADA TODA LA PARTE DE LA PRIMA, REAJUSTES E INTERESES QUE ESTÉN ATRASADOS, INCLUYENDO LOS CORRESPONDIENTES PARA EL CASO DE MORA O SIMPLE RETARDO. SI EL VENCIMIENTO DEL PLAZO DE QUINCE DÍAS, RECIÉN SEÑALADO, RECAYERE EN DÍA SÁBADO, DOMINGO O FESTIVO, SE ENTENDERÁ PRORROGADO PARA EL PRIMER DÍA HÁBIL INMEDIATAMENTE SIGUIENTE QUE NO SEA SÁBADO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "MIENTRAS LA RESOLUCIÓN NO HAYA OPERADO, LA COMPAÑÍA ASEGURADORA PODRÁ DESISTIRSE DE ELLA MEDIANTE UNA NUEVA CARTA EN QUE ASÍ LO COMUNIQUE A LA PERSONA QUE CONTRATÓ EL SEGURO Y DIRIGIDA AL DOMICILIO ANTES ALUDIDO EN ESTA CLÁUSULA.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "LA CIRCUNSTANCIA DE HABER RECIBIDO PAGO DE TODO O PARTE DE LA PRIMA ATRASADA, Y DE SUS REAJUSTES O INTERESES, O DE HABER DESISTIDO DE LA RESOLUCIÓN, NO SIGNIFICARÁ QUE LA COMPAÑÍA RENUNCIA A SU DERECHO A PONER NUEVAMENTE EN PRÁCTICA EL MECANISMO DE LA RESOLUCIÓN PACTADO EN ESTA CLÁUSULA, CADA VEZ QUE SE PRODUZCA UN NUEVO ATRASO EN EL PAGO DE TODO O PARTE DE LA PRIMA.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "CLAUSULAS ESPECIALES:",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "·       SE INCLUYE ANEXO RELATIVO A PROCEDIMIENTO DE LIQUIDACIÓN DE SINIESTROS.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "ANEXO N°1",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "INFORMACIÓN SOBRE ATENCIÓN DE CLIENTES Y PRESENTACIÓN DE CONSULTAS Y RECLAMOS",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EN VIRTUD DE LA CIRCULAR NRO. 2.131 DE 28 DE NOVIEMBRE DE 2013, LAS COMPAÑÍAS DE SEGUROS, CORREDORES DE SEGUROS Y LIQUIDADORES DE SINIESTROS, DEBERÁN RECIBIR, REGISTRAR Y RESPONDER TODAS LAS PRESENTACIONES, CONSULTAS O RECLAMOS QUE SE LES PRESENTEN DIRECTAMENTE POR EL CONTRATANTE, ASEGURADO, BENEFICIARIOS O LEGÍTIMOS INTERESADOS O SUS MANDATARIOS.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "LAS PRESENTACIONES PUEDEN SER EFECTUADAS EN TODAS LAS OFICINAS DE LAS ENTIDADES EN QUE ATIENDA PÚBLICO, PRESENCIALMENTE, POR CORREO POSTAL, MEDIOS ELECTRÓNICOS, O TELEFÓNICAMENTE, SIN FORMALIDADES, EN EL HORARIO NORMAL DE ATENCIÓN.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "RECIBIDA UNA PRESENTACIÓN, CONSULTA O RECLAMO, ÉSTA DEBERÁ SER RESPONDIDA EN EL PLAZO MÁS BREVE POSIBLE, EL QUE NO PODRÁ EXCEDER DE 20 DÍAS HÁBILES CONTADOS DESDE SU RECEPCIÓN.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EL INTERESADO, EN CASO DE DISCONFORMIDAD RESPECTO DE LO INFORMADO, O BIEN CUANDO EXISTA DEMORA INJUSTIFICADA DE LA RESPUESTA, PODRÁ RECURRIR A LA COMISIÓN PARA EL MERCADO FINANCIERO, ÁREA DE PROTECCIÓN AL INVERSIONISTA Y ASEGURADO, CUYAS OFICINAS SE ENCUENTRAN UBICADAS EN AV. LIBERTADOR BERNARDO O’HIGGINS #1449, PISO 1°, SANTIAGO, O A TRAVÉS DEL SITIO WEB WWW.CMFCHILE.CL.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "ANEXO N°2",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "CIRCULAR Nº 2106",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "PROCEDIMIENTO DE LIQUIDACIÓN DE SINIESTROS",
+                    "b": true
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "1)  OBJETO DE LA LIQUIDACIÓN",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "LA LIQUIDACIÓN TIENE POR FIN ESTABLECER LA OCURRENCIA DE UN SINIESTRO, DETERMINAR SI EL SINIESTRO ESTÁ CUBIERTO EN LA PÓLIZA CONTRATADA EN UNA COMPAÑÍA DE SEGUROS DETERMINADA, Y CUANTIFICAR EL MONTO DE LA PÉRDIDA Y DE LA INDEMNIZACIÓN A PAGAR.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EL PROCEDIMIENTO DE LIQUIDACIÓN ESTÁ SOMETIDO A LOS PRINCIPIOS DE CELERIDAD Y ECONOMÍA PROCEDIMENTAL, DE OBJETIVIDAD Y CARÁCTER TÉCNICO Y DE TRANSPARENCIA Y ACCESO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "2)  FORMA DE EFECTUAR LA LIQUIDACIÓN",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "LA LIQUIDACIÓN PUEDE EFECTUARLA DIRECTAMENTE LA COMPAÑÍA O ENCOMENDARLA A UN LIQUIDADOR DE SEGUROS.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "LA DECISIÓN DEBE COMUNICARSE AL ASEGURADO DENTRO DEL PLAZO DE TRES DÍAS HÁBILES CONTADOS DESDE LA FECHA DE LA DENUNCIA DEL SINIESTRO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "3)  DERECHO DE OPOSICIÓN A LA LIQUIDACIÓN DIRECTA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EN CASO DE LIQUIDACIÓN DIRECTA POR LA COMPAÑÍA, EL ASEGURADO O BENEFICIARIO PUEDE OPONERSE A ELLA, SOLICITÁNDOLE POR ESCRITO QUE DESIGNE UN LIQUIDADOR DE SEGUROS, DENTRO DEL PLAZO DE CINCO DÍAS HÁBILES CONTADOS DESDE LA NOTIFICACIÓN DE LA COMUNICACIÓN DE LA COMPAÑÍA. LA COMPAÑÍA DEBERÁ DESIGNAR AL LIQUIDADOR EN EL PLAZO DE DOS DÍAS HÁBILES CONTADOS DESDE DICHA OPOSICIÓN.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "4)  INFORMACION AL ASEGURADO DE GESTIONES A REALIZAR Y PETICION DE ANTECEDENTES",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EL LIQUIDADOR O LA COMPAÑÍA DEBERÁ INFORMAR AL ASEGURADO, POR ESCRITO, EN FORMA SUFICIENTE Y OPORTUNA, AL CORREO ELECTRÓNICO (INFORMADO EN LA DENUNCIA DEL SINIESTRO) O POR CARTA CERTIFICADA (AL DOMICILIO SEÑALADO EN LA DENUNCIA DE SINIESTRO), DE LAS GESTIONES QUE LE CORRESPONDE REALIZAR, SOLICITANDO DE UNA SOLA VEZ, CUANDO LAS CIRCUNSTANCIAS LO PERMITAN, TODOS LOS ANTECEDENTES QUE REQUIERE PARA LIQUIDAR EL SINIESTRO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "5)  PRE-INFORME DE LIQUIDACIÓN",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EN AQUELLOS SINIESTROS EN QUE SURGIEREN PROBLEMAS Y DIFERENCIAS DE CRITERIOS SOBRE SUS CAUSAS, EVALUACIÓN DEL RIESGO O EXTENSIÓN DE LA",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "COBERTURA, PODRÁ EL LIQUIDADOR, ACTUANDO DE OFICIO O A PETICIÓN DEL ASEGURADO, EMITIR UN PRE-INFORME DE LIQUIDACIÓN SOBRE LA COBERTURA DEL SINIESTRO Y EL MONTO DE LOS DAÑOS PRODUCIDOS, EL QUE DEBERÁ PONERSE EN CONOCIMIENTO DE LOS INTERESADOS. EL ASEGURADO O LA COMPAÑÍA PODRÁN HACER OBSERVACIONES POR ESCRITO AL PRE-INFORME DENTRO DEL PLAZO DE CINCO DÍAS HÁBILES DESDE SU CONOCIMIENTO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "6)  PLAZO DE LIQUIDACIÓN",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "DENTRO DEL MÁS BREVE PLAZO, NO PUDIENDO EXCEDER DE 45 DÍAS CORRIDOS DESDE FECHA DENUNCIO, A EXCEPCIÓN DE;",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "A)    SINIESTROS QUE CORRESPONDAN A SEGUROS INDIVIDUALES SOBRE RIESGOS DEL PRIMER GRUPO CUYA PRIMA ANUAL SEA SUPERIOR A 100 UF: 90 DÍAS CORRIDOS DESDE FECHA DENUNCIO;",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "B)    SINIESTROS MARÍTIMOS QUE AFECTEN A LOS CASCOS O EN CASO DE AVERÍA GRUESA: 180 DÍAS CORRIDOS DESDE FECHA DENUNCIO;",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "7)  PRORROGA DEL PLAZO DE LIQUIDACIÓN",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "LOS PLAZOS ANTES SEÑALADOS PODRÁN, EXCEPCIONALMENTE SIEMPRE QUE LAS CIRCUNSTANCIAS LO AMERITEN, PRORROGARSE, SUCESIVAMENTE POR IGUALES PERÍODOS, INFORMANDO LOS MOTIVOS QUE LA FUNDAMENTEN E INDICANDO LAS GESTIONES CONCRETAS Y ESPECÍFICAS QUE SE REALIZARÁN, LO QUE DEBERÁ COMUNICARSE AL ASEGURADO Y A LA COMISION PARA EL MERCADO FINANCIERO,",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "PUDIENDO ESTA ÚLTIMA DEJAR SIN EFECTO LA AMPLIACIÓN, EN CASOS CALIFICADOS, Y FIJAR UN PLAZO PARA ENTREGA DEL INFORME DE LIQUIDACIÓN. NO PODRÁ SER MOTIVO DE PRÓRROGA LA SOLICITUD DE NUEVOS ANTECEDENTES CUYO REQUERIMIENTO PUDO PREVERSE CON ANTERIORIDAD, SALVO QUE SE INDIQUEN LAS RAZONES QUE JUSTIFIQUEN LA FALTA DE REQUERIMIENTO, NI PODRÁN PRORROGARSE LOS SINIESTROS EN QUE NO HAYA EXISTIDO GESTIÓN ALGUNA DEL LIQUIDADOR, REGISTRADO O DIRECTO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "1)   INFORME FINAL DE LIQUIDACIÓN",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "EL INFORME FINAL DE LIQUIDACIÓN DEBERÁ REMITIRSE AL ASEGURADO Y SIMULTÁNEAMENTE AL ASEGURADOR, CUANDO CORRESPONDA, Y DEBERÁ CONTENER NECESARIAMENTE LA TRANSCRIPCIÓN ÍNTEGRA DE LOS ARTÍCULOS 26 Y 27 DEL REGLAMENTO DE AUXILIARES DEL COMERCIO DE SEGUROS (D.S. DE HACIENDA Nº 1.055, DE 2012, DIARIO OFICIAL DE 29 DE DICIEMBRE DE 2012),",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "2)  IMPUGNACIÓN INFORME DE LIQUIDACIÓN",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "RECIBIDO EL INFORME DE LIQUIDACIÓN, LA COMPAÑÍA Y EL ASEGURADO DISPONDRÁN DE UN PLAZO DE DIEZ DÍAS HÁBILES PARA IMPUGNARLA. EN CASO DE LIQUIDACIÓN DIRECTA POR LA COMPAÑÍA, ESTE DERECHO SÓLO LO TENDRÁ EL ASEGURADO.",
+                    "b": false
+                }
+            ]
+        },
+        {
+            "seccion": "contratante",
+            "celdas": [
+                {
+                    "t": "IMPUGNADO EL INFORME, EL LIQUIDADOR O LA COMPAÑÍA DISPONDRÁ DE UN PLAZO DE 6 DÍAS HÁBILES PARA RESPONDER LA IMPUGNACIÓN.",
+                    "b": false
+                }
+            ]
+        }
+    ]
+}

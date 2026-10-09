@@ -40,3 +40,6 @@ export function fechaCorta(fecha) {
     const [anio, mes, dia] = fecha.split("-");
     return `${dia}-${mes}-${anio}`;
 }
+
+/** Nombre de un producto tal como se muestra: en mayúsculas (ODONTÓLOGO, INDIVIDUAL, SOEMAF, DERMA). En la base se guarda como "Odontólogo". */
+export const nombreProducto = (producto) => (producto == null ? producto : String(producto).toLocaleUpperCase("es-CL"));

@@ -1,0 +1,4 @@
+
+# Excel con datos personales de asegurados (RUT, nombres, pagos): no se suben
+*.xlsx
+~$*

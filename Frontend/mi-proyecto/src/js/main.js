@@ -1,5 +1,5 @@
 /**
- * Punto de entrada del front: conecta los tres módulos de la pantalla.
+ * Punto de entrada del front: conecta los módulos de la pantalla.
  *
  *   ┌──────────────┐  clic en resultado   ┌─────────────┐
  *   │ buscador.js  │ ───────────────────▶ │  la URL     │ (#/rut/12345678)
@@ -10,7 +10,6 @@
  *   │  ficha.js    │ ◀──────────────────  sincronizarConUrl()
  *   │  (derecha)   │
  *   └──────────────┘
- *   importador.js: botón "Actualizar nómina" (diálogo aparte); al terminar recarga la ficha.
  *
  * La URL es la única fuente de verdad de "qué ficha está abierta": cualquier clic (resultado,
  * pagador, "paga por") solo cambia el hash, y la pantalla reacciona a ese cambio. Así el
@@ -21,7 +20,9 @@ import "../css/style.css";
 
 import { iniciarBuscador } from "./buscador.js";
 import { crearFicha } from "./ficha.js";
-import { iniciarImportador } from "./importador.js";
+import { obtenerAsegurado } from "./api.js";
+import { abrirEditorCliente } from "./editorCliente.js";
+import { abrirEditorPoliza } from "./editorPoliza.js";
 
 const input = document.getElementById("busqueda");
 
@@ -34,15 +35,6 @@ const buscador = iniciarBuscador({
     input,
     contenedor: document.getElementById("resultados"),
     alSeleccionar: abrirRut, // clic en un resultado de la búsqueda
-});
-
-iniciarImportador({
-    botonAbrir: document.getElementById("abrirImportador"),
-    // Tras actualizar la nómina, la ficha abierta puede haber cambiado
-    alTerminar: () => {
-        const rut = ficha.rutActual();
-        if (rut) ficha.cargar(rut);
-    },
 });
 
 /** Abre la ficha de un RUT. Solo cambia la URL; el resto lo hace sincronizarConUrl(). */
@@ -67,6 +59,25 @@ function sincronizarConUrl() {
     buscador.marcar(rut);
     ficha.cargar(rut);
 }
+
+/**
+ * "Nuevo cliente": paso 1 crea a la persona; paso 2 abre su ficha y el formulario "Agregar póliza" con el producto, el número, las
+ * fechas, el deducible y la prima ya propuestos. Si se cancela el paso 2, la persona queda creada y la póliza se agrega después.
+ */
+document.getElementById("botonNuevoCliente").addEventListener("click", () => {
+    abrirEditorCliente(async (cliente) => {
+        abrirRut(cliente.rut);
+        try {
+            const { asegurado: a } = await obtenerAsegurado(cliente.rut);
+            abrirEditorPoliza({
+                rut: a.rut, nombre: a.nombre, especialidad: a.especialidad, conSiniestro: a.con_siniestro,
+                deducibleSugerido: a.con_siniestro ? a.deducible_uf : null, sugerenciaProducto: cliente.producto_sugerido,
+            }, () => ficha.cargar(a.rut, "Cliente creado con su póliza."));
+        } catch (error) {
+            alert(`El cliente se creó, pero no se pudo abrir su póliza: ${error.message}`);
+        }
+    });
+});
 
 window.addEventListener("hashchange", sincronizarConUrl); // cada vez que cambia la URL
 sincronizarConUrl();                                      // y una vez al cargar la página

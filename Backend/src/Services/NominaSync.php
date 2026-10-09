@@ -9,15 +9,20 @@ use RuntimeException;
 /**
  * Sincroniza el Excel madre (hoja "NOMINA ACT 2024") con la base de datos.
  *
+ * Todo lo que trae el Excel madre pertenece a la póliza de producto "Odontólogo" de cada
+ * persona. Si la persona tiene otras pólizas (p. ej. Dermo/Estética), esta sincronización
+ * NO las toca: ni sus datos ni sus pagos.
+ *
  * ── Flujo de datos ────────────────────────────────────────────────────────────
  *   Excel madre ──leerHoja()──▶ filas + columnas de meses
  *        │
  *        ├─ se agrupan por RUT (una persona puede tener varias filas: re-afiliaciones)
  *        │
  *        └─ por cada RUT:
- *             1. valoresAsegurado()  ──▶ INSERT/UPDATE en `asegurados`
- *             2. afiliaciones previas ─▶ `historial_cambios`
- *             3. combinarMeses()     ──▶ INSERT/UPDATE en `pagos_mensuales`
+ *             1. valoresAsegurado()  ──▶ INSERT/UPDATE en `asegurados` (la persona)
+ *             2. valoresPoliza()     ──▶ INSERT/UPDATE en `polizas` (su póliza de Odontólogo)
+ *             3. afiliaciones previas ─▶ `historial_cambios`
+ *             4. combinarMeses()     ──▶ INSERT/UPDATE en `pagos_mensuales` (de esa póliza)
  *        todo dentro de UNA transacción: si algo falla no queda nada a medias.
  *
  * ── Garantías ─────────────────────────────────────────────────────────────────
@@ -26,7 +31,7 @@ use RuntimeException;
  *   - NO pisa los pagos editados a mano desde el front (`editado = 1`): los cuenta
  *     como "conflictos" en el resumen.
  *   - NO revierte un cambio de estado hecho por la aplicación (`estado_manual = 1`, cuando
- *     una persona pasó a NO VIGENTE por 3 meses sin pago) mientras el Excel no lo refleje.
+ *     una persona pasó a NO VIGENTE por 2 meses sin pago) mientras el Excel no lo refleje.
  *   - NO borra nada: si algo desaparece del Excel, sigue en la base.
  *
  * Lo usan api/importar.php (botón "Actualizar nómina") y scripts/sincronizar_nomina.php.
@@ -138,6 +143,8 @@ class NominaSync
             'filas_sin_rut' => $sinRut,
             'asegurados_nuevos' => 0,
             'asegurados_actualizados' => 0,
+            'polizas_nuevas' => 0,
+            'polizas_actualizadas' => 0,
             'pagos_nuevos' => 0,
             'pagos_actualizados' => 0,
             'pagos_sin_cambios' => 0,
@@ -160,37 +167,44 @@ class NominaSync
             }
 
             $this->cargarCatalogos();
-            $tipoDentista = (int) $this->pdo->query("SELECT id FROM tipos_asegurado WHERE nombre = 'dentista'")->fetchColumn();
+            $productoId = $this->idProductoMadre();
 
             // Se carga en memoria lo que ya existe para decidir, sin una consulta por fila,
             // si cada mes es nuevo, cambió o quedó igual (son ~400 mil filas). En un aviso de la
             // hoja solo se cargan las personas recibidas.
             $ruts = $completa ? null : array_keys($porRut);
-            $existentes = $this->cargarPagosExistentes($ruts);
+            $existentes = $this->cargarPagosExistentes($productoId, $ruts);
+            $polizaIds = $this->cargarPolizaIds($productoId, $ruts); // rut => id de su póliza Odontólogo
             $historialPrevio = $this->cargarHistorialAfiliaciones($ruts);
             // Quién figura como autor de los cambios en historial_cambios
             $usuario = $completa ? 'sincronizacion' : 'hoja';
 
-            // Inserta el asegurado o, si el RUT ya existe, actualiza todos sus datos del Excel.
-            // El Excel manda sobre los datos de la persona (a diferencia de los pagos editados),
-            // con una excepción: el `estado`. Si la aplicación pasó a la persona a NO VIGENTE
-            // (estado_manual = 1), se conserva mientras el Excel diga otra cosa; en cuanto el
-            // Excel coincide, la marca se limpia. MySQL evalúa las asignaciones de izquierda a
-            // derecha, por eso `estado_manual` va antes que `estado`.
+            // Persona: se inserta o, si el RUT ya existe, se actualizan sus datos de identidad.
+            // `especialidad` no está en el Excel madre, así que no se toca (la carga el Excel de pólizas).
             $upsertAseg = $this->pdo->prepare(
-                'INSERT INTO asegurados (rut, dv, dv_valido, nombre, genero, telefono, mail, tipo_id, poliza,
-                    cobertura_id, medio_pago_id, rut_pagador, dv_pagador, rut_pagador_original, fecha_alta,
-                    fecha_titulacion, fecha_baja, fecha_baja_texto, motivo_baja_id, estado)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                'INSERT INTO asegurados (rut, dv, dv_valido, nombre, genero, telefono, mail)
+                 VALUES (?,?,?,?,?,?,?)
                  ON DUPLICATE KEY UPDATE dv=VALUES(dv), dv_valido=VALUES(dv_valido), nombre=VALUES(nombre),
-                    genero=VALUES(genero), telefono=VALUES(telefono), mail=VALUES(mail), poliza=VALUES(poliza),
-                    cobertura_id=VALUES(cobertura_id), medio_pago_id=VALUES(medio_pago_id),
-                    rut_pagador=VALUES(rut_pagador), dv_pagador=VALUES(dv_pagador),
-                    rut_pagador_original=VALUES(rut_pagador_original), fecha_alta=VALUES(fecha_alta),
-                    fecha_titulacion=VALUES(fecha_titulacion), fecha_baja=VALUES(fecha_baja),
-                    fecha_baja_texto=VALUES(fecha_baja_texto), motivo_baja_id=VALUES(motivo_baja_id),
-                    estado_manual=IF(estado_manual = 1 AND VALUES(estado) <> estado, 1, 0),
-                    estado=IF(estado_manual = 1, estado, VALUES(estado))'
+                    genero=VALUES(genero), telefono=VALUES(telefono), mail=VALUES(mail)'
+            );
+            // Póliza Odontólogo de la persona (la más reciente si tiene varias, una por período). El Excel manda sobre sus
+            // datos (a diferencia de los pagos editados), con una excepción: el `estado`. Si la
+            // aplicación pasó la póliza a NO VIGENTE (estado_manual = 1), se conserva mientras el
+            // Excel diga otra cosa; en cuanto el Excel coincide, la marca se limpia. MySQL evalúa las
+            // asignaciones de izquierda a derecha, por eso `estado_manual` va antes que `estado`.
+            // `tipo_individuo_id` no se toca: lo gobierna el Excel de pólizas.
+            $insertPoliza = $this->pdo->prepare(
+                'INSERT INTO polizas (rut, producto_id, numero, cobertura_id, medio_pago_id, rut_pagador, dv_pagador,
+                    rut_pagador_original, fecha_alta, fecha_titulacion, fecha_baja, fecha_baja_texto, motivo_baja_id, estado, va_a_corte)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            );
+            $updatePoliza = $this->pdo->prepare(
+                'UPDATE polizas SET numero=?, cobertura_id=?, medio_pago_id=?, rut_pagador=?, dv_pagador=?,
+                    rut_pagador_original=?, fecha_alta=?, fecha_titulacion=?, fecha_baja=?, fecha_baja_texto=?, motivo_baja_id=?,
+                    estado_manual=IF(estado_manual = 1 AND ? <> estado, 1, 0),
+                    estado=IF(estado_manual = 1, estado, ?),
+                    va_a_corte=IF(estado = \'VIGENTE\', ?, 0)
+                 WHERE id = ?'
             );
             $insHistorial = $this->pdo->prepare(
                 "INSERT INTO historial_cambios (tabla, registro, campo, valor_anterior, valor_nuevo, usuario)
@@ -209,7 +223,7 @@ class NominaSync
                 $actual = $afiliaciones[array_key_last($afiliaciones)]['datos'];
 
                 // 1. Datos de la persona (siempre desde su afiliación más reciente)
-                $upsertAseg->execute($this->valoresAsegurado($rut, $actual, $tipoDentista, $s));
+                $upsertAseg->execute($this->valoresAsegurado($rut, $actual, $s));
                 // MySQL informa 1 = fila insertada, 2 = fila existente que cambió, 0 = sin cambios
                 match ($upsertAseg->rowCount()) {
                     1 => $s['asegurados_nuevos']++,
@@ -217,7 +231,20 @@ class NominaSync
                     default => null,
                 };
 
-                // 2. Afiliaciones anteriores: no tienen tabla propia, se conservan en el historial
+                // 2. Su póliza de Odontólogo (se crea si es la primera vez)
+                $v = $this->valoresPoliza($rut, $productoId, $actual);
+                if (isset($polizaIds[$rut])) {
+                    // Ya tiene póliza Odontólogo: se actualiza por su id (MySQL informa 1 si algo cambió, 0 si quedó igual)
+                    $updatePoliza->execute([...array_slice($v, 2, 11), $v[13], $v[13], $v[14], $polizaIds[$rut]]);
+                    if ($updatePoliza->rowCount() > 0) $s['polizas_actualizadas']++;
+                } else {
+                    $insertPoliza->execute($v);
+                    $polizaIds[$rut] = (int) $this->pdo->lastInsertId(); // póliza recién creada
+                    $s['polizas_nuevas']++;
+                }
+                $polizaId = $polizaIds[$rut];
+
+                // 3. Afiliaciones anteriores: no tienen tabla propia, se conservan en el historial
                 foreach (array_slice($afiliaciones, 0, -1) as $prev) {
                     $d = $prev['datos'];
                     $json = json_encode([
@@ -238,14 +265,14 @@ class NominaSync
                     }
                 }
 
-                // 3. Pagos mes a mes: comparar contra lo que ya hay en la base
+                // 4. Pagos mes a mes: comparar contra lo que ya hay en la base
                 foreach ($this->combinarMeses($afiliaciones, $columnasMes) as $periodo => $m) {
                     $clave = $rut . '|' . $periodo;
                     $actualBD = $existentes[$clave] ?? null;
 
                     if ($actualBD === null) {
                         // Mes que no existía: se acumula para insertarlo en lote
-                        $lote[] = [$rut, $periodo, $m['pagado'], $m['monto'], $importacionId, 'madre', $m['valor_original'], $m['nota']];
+                        $lote[] = [$polizaId, $periodo, $m['pagado'], $m['monto'], $importacionId, 'madre', $m['valor_original'], $m['nota']];
                         $s['pagos_nuevos']++;
                         if (count($lote) >= 500) {
                             $this->insertarPagos($lote);
@@ -281,7 +308,7 @@ class NominaSync
 
             if ($completa) {
                 // Personas cuyo estado cambió la aplicación y que el Excel aún da por vigentes
-                $s['estados_mantenidos_manualmente'] = (int) $this->pdo->query('SELECT COUNT(*) FROM asegurados WHERE estado_manual = 1')->fetchColumn();
+                $s['estados_mantenidos_manualmente'] = (int) $this->pdo->query('SELECT COUNT(*) FROM polizas WHERE estado_manual = 1')->fetchColumn();
 
                 $this->pdo->prepare('UPDATE importaciones SET filas_cargadas = ?, resumen = ? WHERE id = ?')
                     ->execute([count($porRut), json_encode($s), $importacionId]);
@@ -361,31 +388,19 @@ class NominaSync
         return $columnasMes;
     }
 
-    // ------------------------------------------------------------ asegurados
+    // ------------------------------------------------------------ asegurados y pólizas
 
     /**
-     * Convierte una fila del Excel en los 20 valores (en orden) que recibe el INSERT de `asegurados`.
-     * Limpia espacios, convierte fechas, valida el dígito verificador y traduce textos a ids de catálogo.
+     * Convierte una fila del Excel en los 7 valores (en orden) que recibe el INSERT de `asegurados`
+     * (los datos de identidad de la persona). Limpia espacios y valida el dígito verificador.
      *
      * @param array $s contadores de la sincronización; se suma aquí los DV inválidos (por referencia)
      */
-    private function valoresAsegurado(int $rut, array $f, int $tipoId, array &$s): array
+    private function valoresAsegurado(int $rut, array $f, array &$s): array
     {
         $dv = strtoupper((string) $f[self::C_DV]);
         $dvValido = $dv === $this->calcularDv($rut) ? 1 : 0;
         $s['dv_invalido'] += 1 - $dvValido;
-
-        $pagador = $this->parsearRutPagador($f[self::C_PAGADOR]);
-
-        // La baja puede venir como fecha o como texto libre; cada una va a su propia columna
-        $baja = $f[self::C_BAJA];
-        $motivo = $this->limpiar($f[self::C_MOTIVO]);
-        $cobertura = $this->limpiar($f[self::C_COBERTURA]);
-
-        $estado = strtoupper((string) $f[self::C_ESTADO]);
-        if (!in_array($estado, ['VIGENTE', 'VAN A CORTE', 'NO VIGENTE'], true)) {
-            $estado = 'NO VIGENTE';
-        }
 
         // "Sin Telefono" y similares no son teléfonos
         $telefono = $this->limpiar($f[self::C_TELEFONO]);
@@ -401,7 +416,33 @@ class NominaSync
             $this->limpiar($f[self::C_GENERO]),
             $telefono,
             $this->limpiar($f[self::C_MAIL]),
-            $tipoId,
+        ];
+    }
+
+    /**
+     * Convierte una fila del Excel en los 14 valores (en orden) que recibe el INSERT de `polizas`.
+     * Convierte fechas y traduce textos a ids de catálogo.
+     */
+    private function valoresPoliza(int $rut, int $productoId, array $f): array
+    {
+        $pagador = $this->parsearRutPagador($f[self::C_PAGADOR]);
+
+        // La baja puede venir como fecha o como texto libre; cada una va a su propia columna
+        $baja = $f[self::C_BAJA];
+        $motivo = $this->limpiar($f[self::C_MOTIVO]);
+        $cobertura = $this->limpiar($f[self::C_COBERTURA]);
+
+        $estado = strtoupper((string) $f[self::C_ESTADO]);
+        if (!in_array($estado, ['VIGENTE', 'VAN A CORTE', 'NO VIGENTE'], true)) {
+            $estado = 'NO VIGENTE';
+        }
+        // "Va a corte" no es un estado: la póliza sigue VIGENTE y se guarda el aviso aparte
+        $vaACorte = $estado === 'VAN A CORTE' ? 1 : 0;
+        if ($vaACorte) $estado = 'VIGENTE';
+
+        return [
+            $rut,
+            $productoId,
             $this->limpiar($f[self::C_POLIZA]),
             $this->idCatalogo('coberturas', $cobertura === null ? null : mb_strtoupper($cobertura)),
             $this->idCatalogo('medios_pago', $this->normalizarMedioPago($this->limpiar($f[self::C_MEDIO_PAGO]))),
@@ -414,7 +455,35 @@ class NominaSync
             !is_numeric($baja) ? $this->limpiar($baja) : null,
             $this->idCatalogo('motivos_baja', $motivo === null ? null : mb_strtoupper($motivo)),
             $estado,
+            $vaACorte,
         ];
+    }
+
+    /** Id del producto de las pólizas del Excel madre (lo crea si la base aún no lo tiene). */
+    private function idProductoMadre(): int
+    {
+        $nombre = 'Odontólogo'; // mismo valor que PRODUCTO_MADRE en api/_comun.php
+        $this->pdo->prepare('INSERT IGNORE INTO productos (nombre) VALUES (?)')->execute([$nombre]);
+        $q = $this->pdo->prepare('SELECT id FROM productos WHERE nombre = ?');
+        $q->execute([$nombre]);
+        return (int) $q->fetchColumn();
+    }
+
+    /**
+     * Pólizas Odontólogo que ya existen: rut => id de póliza. Con $ruts solo las de esas personas.
+     * @return array<int,int>
+     */
+    private function cargarPolizaIds(int $productoId, ?array $ruts = null): array
+    {
+        // Si una persona tiene varias pólizas del producto (una por período), queda la de vigencia más reciente:
+        // en un FETCH_KEY_PAIR gana la última fila de cada RUT, por eso van ordenadas de la más antigua a la más reciente
+        $q = $this->pdo->prepare(
+            'SELECT z.rut, z.id FROM polizas z WHERE z.producto_id = ?'
+            . ($ruts === null ? '' : ' AND z.rut IN (' . $this->marcadores($ruts) . ')')
+            . ' ORDER BY z.rut, COALESCE((SELECT MAX(vigencia_hasta) FROM poliza_periodos WHERE poliza_id = z.id), \'0000-00-00\'), z.id'
+        );
+        $q->execute(array_merge([$productoId], $ruts ?? []));
+        return array_map('intval', $q->fetchAll(PDO::FETCH_KEY_PAIR));
     }
 
     // ------------------------------------------------------------ pagos
@@ -518,17 +587,20 @@ class NominaSync
     }
 
     /**
-     * Carga todos los pagos que hay en la base, indexados por "rut|periodo".
-     * Permite decidir en memoria si un mes del Excel es nuevo, cambió o es igual.
+     * Carga los pagos de las pólizas Odontólogo que hay en la base, indexados por "rut|periodo".
+     * Permite decidir en memoria si un mes del Excel es nuevo, cambió o es igual. Los pagos de
+     * otras pólizas de la misma persona no se cargan, así que la sincronización nunca los toca.
      */
-    private function cargarPagosExistentes(?array $ruts = null): array
+    private function cargarPagosExistentes(int $productoId, ?array $ruts = null): array
     {
         $mapa = [];
         $q = $this->pdo->prepare(
-            'SELECT id, rut, periodo, pagado, monto, editado FROM pagos_mensuales'
-            . ($ruts === null ? '' : ' WHERE rut IN (' . $this->marcadores($ruts) . ')')
+            'SELECT p.id, z.rut, p.periodo, p.pagado, p.monto, p.editado
+             FROM pagos_mensuales p JOIN polizas z ON z.id = p.poliza_id
+             WHERE z.producto_id = ?'
+            . ($ruts === null ? '' : ' AND z.rut IN (' . $this->marcadores($ruts) . ')')
         );
-        $q->execute($ruts ?? []);
+        $q->execute(array_merge([$productoId], $ruts ?? []));
         while ($r = $q->fetch()) {
             $mapa[$r['rut'] . '|' . $r['periodo']] = $r;
         }
@@ -569,14 +641,14 @@ class NominaSync
 
     /**
      * Inserta varios pagos nuevos en una sola sentencia (mucho más rápido que uno a uno).
-     * @param array $lote lista de filas [rut, periodo, pagado, monto, importacion_id, origen, valor_original, nota]
+     * @param array $lote lista de filas [poliza_id, periodo, pagado, monto, importacion_id, origen, valor_original, nota]
      */
     private function insertarPagos(array $lote): void
     {
         if (!$lote) {
             return;
         }
-        $sql = 'INSERT INTO pagos_mensuales (rut, periodo, pagado, monto, importacion_id, origen, valor_original, nota) VALUES '
+        $sql = 'INSERT INTO pagos_mensuales (poliza_id, periodo, pagado, monto, importacion_id, origen, valor_original, nota) VALUES '
              . implode(',', array_fill(0, count($lote), '(?,?,?,?,?,?,?,?)'));
         $this->pdo->prepare($sql)->execute(array_merge(...$lote));
     }
